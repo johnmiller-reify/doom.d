@@ -4,12 +4,14 @@
  user-mail-address                   "john.miller@reifyhealth.com"
  org-directory                       "~/org/"
  auth-sources                        '("~/.authinfo.gpg")
- tab-always-indent                   nil
- display-line-numbers-type           nil
- confirm-kill-emacs                  nil
  doom-font                           (font-spec :family "JetBrains Mono" :size 16)
  doom-big-font                       (font-spec :family "JetBrains Mono" :size 24)
  doom-variable-pitch-font            (font-spec :family "Overpass"       :size 16)
+ doom-theme                          'iterati
+ tab-always-indent                   nil
+ kill-do-not-save-duplicates         t
+ display-line-numbers-type           nil
+ confirm-kill-emacs                  nil
  doom-modeline-hud                   t
  doom-modeline-icon                  t
  doom-modeline-major-mode-icon       t
@@ -18,11 +20,25 @@
  display-time-default-load-average   nil
  display-time-24hr-format            t
  display-time-day-and-date           t
- doom-theme                          'iterati
  rainbow-delimiters-max-face-count   7
  scroll-margin                       10
  left-fringe-width                   1
  right-fringe-width                  1)
+
+(setq consult-buffer-filter
+      '("\\` "
+        "\\`\\*Buffer List\\*\\'"
+        "\\`\\*Completions\\*\\'"
+        "\\`\\*Flymake log\\*\\'"
+        "\\`\\*Messages\\*\\'"
+        "\\`\\*Semantic SymRef\\*\\'"
+        "\\`\\*compilation\\*.*\\'"
+        "\\`\\*tramp/.*\\*\\'"
+        "\\`\\*envrc\\*\\'"
+        "\\`\\*cider-doc\\*\\'"
+        "\\`\\*flycheck.*\\*\\'"
+        "\\`\\*lsp.*\\*\\'"
+        "\\`\\*ts.*\\*\\'"))
 
 (auto-dim-other-buffers-mode 1)
 (display-time-mode 1)
@@ -76,12 +92,16 @@
   (setq iterati-light (not iterati-light))
   (load-theme 'iterati))
 
+(defun align-whitespace (start end)
+  "Align columns by whitespace"
+  (interactive "r")
+  (align-regexp start end
+                "\\s-*\\(\\s-*\\)\\s-" 1 0 t))
+
 (map! :map vertico-map "RET"   #'vertico-directory-enter)
 (map! :map vertico-map "DEL"   #'vertico-directory-delete-char)
 (map! :map vertico-map "M-DEL" #'vertico-directory-delete-word)
-(map! :leader
-      (:prefix "s"
-       :desc "Clear search highlights" :n "c" #'evil-ex-nohighlight))
-(map! :leader
-      (:prefix "t"
-       :desc "Toggle light/dark mode" :n "m" #'toggle-light-mode))
+
+(map! :leader (:prefix "s" :desc "Clear search highlights" :n "c" #'evil-ex-nohighlight))
+(map! :leader (:prefix "t" :desc "Toggle light/dark mode"  :n "m" #'toggle-light-mode))
+(map! :leader              :desc "Align by whitespace"     :v "=" #'align-whitespace)
